@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>移动端首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding-bottom: 60px;
+            overflow-x: hidden;
+        }
+
+        /* 轮播图样式 */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            height: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            width: 20px;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        /* 图标网格样式 */
+        .icon-grid {
+            background: #fff;
+            padding: 20px 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .icon-item:active {
+            transform: scale(0.95);
+        }
+
+        .icon-wrapper {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-item:nth-child(1) .icon-wrapper { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .icon-item:nth-child(2) .icon-wrapper { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .icon-item:nth-child(3) .icon-wrapper { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .icon-item:nth-child(4) .icon-wrapper { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .icon-item:nth-child(5) .icon-wrapper { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .icon-item:nth-child(6) .icon-wrapper { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .icon-item:nth-child(7) .icon-wrapper { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .icon-item:nth-child(8) .icon-wrapper { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+
+        .icon {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .icon-label {
+            font-size: 12px;
+            color: #333;
+            text-align: center;
+        }
+
+        /* 底部导航样式 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 30px;
+            height: 3px;
+            background: #667eea;
+            border-radius: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.active::before {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .nav-text {
+            font-size: 11px;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active .nav-text {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        /* 内容区域 */
+        .content-section {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .more-link {
+            font-size: 13px;
+            color: #999;
+            text-decoration: none;
+        }
+
+        .card-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .card-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .card {
+            min-width: 140px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .card img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 10px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-desc {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .icon-item {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .icon-item:nth-child(1) { animation-delay: 0.1s; }
+        .icon-item:nth-child(2) { animation-delay: 0.15s; }
+        .icon-item:nth-child(3) { animation-delay: 0.2s; }
+        .icon-item:nth-child(4) { animation-delay: 0.25s; }
+        .icon-item:nth-child(5) { animation-delay: 0.3s; }
+        .icon-item:nth-child(6) { animation-delay: 0.35s; }
+        .icon-item:nth-child(7) { animation-delay: 0.4s; }
+        .icon-item:nth-child(8) { animation-delay: 0.45s; }
+    </style>
+</head>
+<body>
+    <!-- 轮播图 -->
+    <div class="carousel-container">
+        <div class="carousel-wrapper" id="carouselWrapper">
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/seed/slide1/400/200.jpg" alt="轮播图1">
+            </div>
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/seed/slide2/400/200.jpg" alt="轮播图2">
+            </div>
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/seed/slide3/400/200.jpg" alt="轮播图3">
+            </div>
+            <div class="carousel-slide">
+                <img src="https://picsum.photos/seed/slide4/400/200.jpg" alt="轮播图4">
+            </div>
+        </div>
+        <div class="carousel-indicators" id="indicators"></div>
+    </div>
+
+    <!-- 图标网格 -->
+    <div class="icon-grid">
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">🛍️</span>
+            </div>
+            <span class="icon-label">购物</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">🍔</span>
+            </div>
+            <span class="icon-label">美食</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">🎬</span>
+            </div>
+            <span class="icon-label">电影</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">🏨</span>
+            </div>
+            <span class="icon-label">酒店</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">🚗</span>
+            </div>
+            <span class="icon-label">出行</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">💼</span>
+            </div>
+            <span class="icon-label">工作</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">🎮</span>
+            </div>
+            <span class="icon-label">游戏</span>
+        </div>
+        <div class="icon-item">
+            <div class="icon-wrapper">
+                <span class="icon">⚙️</span>
+            </div>
+            <span class="icon-label">更多</span>
+        </div>
+    </div>
+
+    <!-- 推荐内容 -->
+    <div class="content-section">
+        <div class="section-title">
+            <span>热门推荐</span>
+            <a href="#" class="more-link">查看更多 →</a>
+        </div>
+        <div class="card-list">
+            <div class="card">
+                <img src="https://picsum.photos/seed/card1/140/100.jpg" alt="推荐1">
+                <div class="card-content">
+                    <div class="card-title">精选好物</div>
+                    <div class="card-desc">限时特惠</div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://picsum.photos/seed/card2/140/100.jpg" alt="推荐2">
+                <div class="card-content">
+                    <div class="card-title">热门活动</div>
+                    <div class="card-desc">参与赢好礼</div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="https://picsum.photos/seed/card3/140/100.jpg" alt="推荐3">
+                <div class="card-content">
+                    <div class="card-title">新品上市</div>
+                    <div class="card-desc">抢先体验</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" data-page="home">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">首页</span>
+        </div>
+        <div class="nav-item" data-page="discover">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-text">发现</span>
+        </div>
+        <div class="nav-item" data-page="message">
+            <span class="nav-icon">💬</span>
+            <span class="nav-text">消息</span>
+        </div>
+        <div class="nav-item" data-page="profile">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">我的</span>
+        </div>
+    </nav>
+
+    <script>
+        // 轮播图功能
+        class Carousel {
+            constructor() {
+                this.wrapper = document.getElementById('carouselWrapper');
+                this.slides = this.wrapper.children;
+                this.currentIndex = 0;
+                this.totalSlides = this.slides.length;
+                this.autoPlayInterval = null;
+                this.init();
+            }
+
+            init() {
+                this.createIndicators();
+                this.startAutoPlay();
+                this.addTouchEvents();
+            }
+
+            createIndicators() {
+                const indicatorsContainer = document.getElementById('indicators');
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'indicator';
+                    if (i === 0) indicator.classList.add('active');
+                    indicator.addEventListener('click', () => this.goToSlide(i));
+                    indicatorsContainer.appendChild(indicator);
+                }
+                this.indicators = indicatorsContainer.children;
+            }
+
+            updateIndicators() {
+                Array.from(this.indicators).forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === this.currentIndex);
+                });
+            }
+
+            goToSlide(index) {
+                this.currentIndex = index;
+                this.wrapper.style.transform = `translateX(-${index * 100}%)`;
+                this.updateIndicators();
+            }
+
+            nextSlide() {
+                this.currentIndex = (this.currentIndex + 1) % this.totalSlides;
+                this.goToSlide(this.currentIndex);
+            }
+
+            startAutoPlay() {
+                this.autoPlayInterval = setInterval(() => this.nextSlide(), 3000);
+            }
+
+            stopAutoPlay() {
+                clearInterval(this.autoPlayInterval);
+            }
+
+            addTouchEvents() {
+                let startX = 0;
+                let endX = 0;
+
+                this.wrapper.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    this.stopAutoPlay();
+                });
+
+                this.wrapper.addEventListener('touchend', (e) => {
+                    endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.currentIndex = (this.currentIndex - 1 + this.totalSlides) % this.totalSlides;
+                            this.goToSlide(this.currentIndex);
+                        }
+                    }
+                    this.startAutoPlay();
+                });
+            }
+        }
+
+        // 底部导航功能
+        class BottomNav {
+            constructor() {
+                this.navItems = document.querySelectorAll('.nav-item');
+                this.init();
+            }
+
+            init() {
+                this.navItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        this.setActive(item);
+                        this.handlePageChange(item.dataset.page);
+                    });
+                });
+            }
+
+            setActive(activeItem) {
+                this.navItems.forEach(item => item.classList.remove('active'));
+                activeItem.classList.add('active');
+            }
+
+            handlePageChange(page) {
+                console.log(`切换到页面: ${page}`);
+                // 这里可以添加页面切换逻辑
+                this.showToast(`切换到${this.getPageName(page)}`);
+            }
+
+            getPageName(page) {
+                const names = {
+                    home: '首页',
+                    discover: '发现',
+                    message: '消息',
+                    profile: '我的'
+                };
+                return names[page] || page;
+            }
+
+            showToast(message) {
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    z-index: 1000;
+                    animation: fadeInOut 2s ease;
+                `;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 2000);
+            }
+        }
+
+        // 图标点击事件
+        document.querySelectorAll('.icon-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const label = this.querySelector('.icon-label').textContent;
+                console.log(`点击了: ${label}`);
+                
+                // 添加点击动画
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+
+        // 卡片点击事件
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                const title = this.querySelector('.card-title').textContent;
+                console.log(`点击了卡片: ${title}`);
+            });
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            new Carousel();
+            new BottomNav();
+        });
+
+        // 添加淡入淡出动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
